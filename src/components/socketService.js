@@ -3,7 +3,7 @@ let isConnected = false;
 let messageHandler = null;
 let connectionCallbacks = null;
 
-const GAME_ID_PATTERN = /^[a-f0-9]{32}$/;
+const GAME_ID_PATTERN = /^[a-z0-9]{6}$/;
 const MAX_SERVER_MESSAGE_BYTES = 8192;
 
 const configuredHttpUrl = import.meta.env.VITE_BACKEND_HTTP_URL;

@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import { isValidGameId, parseServerMessage } from "./socketService";
 
 describe("socket message validation", () => {
-  it("accepts only canonical Cloudflare game IDs", () => {
-    expect(isValidGameId("a".repeat(32))).toBe(true);
-    expect(isValidGameId("A".repeat(32))).toBe(false);
-    expect(isValidGameId("short-id")).toBe(false);
+  it("accepts only 6-char lowercase alphanumeric game IDs", () => {
+    expect(isValidGameId("a".repeat(6))).toBe(true);
+    expect(isValidGameId("abc123")).toBe(true);
+    expect(isValidGameId("A".repeat(6))).toBe(false);
+    expect(isValidGameId("short")).toBe(false);
+    expect(isValidGameId("toolong123")).toBe(false);
+    expect(isValidGameId("ab-def")).toBe(false);
   });
 
   it("rejects malformed and oversized server frames", () => {

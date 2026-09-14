@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /singleplayer
+Disallow: /api/
+Disallow: /*?
+
+Sitemap: https://rps.abhyasadh.com/sitemap.xml

@@ -16,6 +16,7 @@ import restart from "../assets/restart.png";
 import ready from "../assets/ready.png";
 import copy from "../assets/copy.png";
 import { connectToServer } from "../components/socketService";
+import SEO from "../components/SEO";
 
 function Game() {
   const { gameId } = useParams();
@@ -127,6 +128,13 @@ function Game() {
 
   return (
     <div className="gamePage">
+      <SEO
+        title="Game"
+        description="Play Rock Paper Scissors against an opponent in real time."
+        path={`/${gameId}`}
+        noindex
+        nofollow
+      />
       <div className="gameArea">
         <div className="players player-1">
           <div className="playerName">

@@ -13,6 +13,7 @@ import {
   isValidGameId,
 } from "../components/socketService";
 import { toast } from "react-toastify";
+import SEO from "../components/SEO";
 
 function Home() {
   const navigate = useNavigate();
@@ -133,6 +134,11 @@ function Home() {
 
   return (
     <>
+      <SEO
+        title={null}
+        description="Play Rock Paper Scissors online against friends or the computer. Create a game, share the code, and play in real time."
+        path="/"
+      />
       <div className="homePage">
         <div className="floatingChoices" aria-hidden="true">
           <img className="floatingChoice fc-1" src={rock} alt="" />

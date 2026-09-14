@@ -8,17 +8,20 @@ import {
   Route,
 } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { HelmetProvider } from 'react-helmet-async';
 
 function App() {
   return (
-    <Router>
-      <ToastContainer position="top-center" />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/singleplayer" element={<SinglePlayer />} />
-        <Route path="/:gameId" element={<Game />} />
-      </Routes>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <ToastContainer position="top-center" />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/singleplayer" element={<SinglePlayer />} />
+          <Route path="/:gameId" element={<Game />} />
+        </Routes>
+      </Router>
+    </HelmetProvider>
   );
 }
 

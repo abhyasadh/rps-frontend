@@ -6,6 +6,7 @@ import paper from "../assets/paper.png";
 import scissors from "../assets/scissors.png";
 import home from "../assets/home.png";
 import restart from "../assets/restart.png";
+import SEO from "../components/SEO";
 
 function SinglePlayer() {
   const navigate = useNavigate();
@@ -45,6 +46,11 @@ function SinglePlayer() {
 
   return (
     <div className="gamePage">
+      <SEO
+        title="Single Player"
+        description="Play Rock Paper Scissors against the computer. Pick your move and see if you can win!"
+        path="/singleplayer"
+      />
       <div className="gameArea">
         <div className="players player-1">
           <div className="playerName">You {isScored ? `(${playerScore})` : ""}</div>

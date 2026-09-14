@@ -12,12 +12,110 @@ body {
 }
 
 .homePage {
+  position: relative;
   width: 100vw;
   height: 100vh;
+  min-height: 540px;
+  overflow: hidden;
   background: linear-gradient(315deg, rgb(20, 20, 20), rgb(44, 44, 44));
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.floatingChoices {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.floatingChoice {
+  position: absolute;
+  height: auto;
+  opacity: 0.065;
+  filter: saturate(0.5);
+}
+
+.fc-1 {
+  width: clamp(70px, 10vw, 140px);
+  top: 10%;
+  left: 20%;
+  animation: floatA 10s ease-in-out infinite -1s;
+}
+
+.fc-2 {
+  width: clamp(100px, 14vw, 200px);
+  top: 32%;
+  left: 4%;
+  animation: floatB 13s ease-in-out infinite -4s;
+}
+
+.fc-3 {
+  width: clamp(90px, 13vw, 190px);
+  bottom: 8%;
+  left: 14%;
+  animation: floatC 11s ease-in-out infinite -7s;
+}
+
+.fc-4 {
+  width: clamp(130px, 18vw, 270px);
+  top: 8%;
+  right: 6%;
+  animation: floatB 12s ease-in-out infinite -2s;
+}
+
+.fc-5 {
+  width: clamp(100px, 14vw, 210px);
+  bottom: 12%;
+  right: 10%;
+  animation: floatA 14s ease-in-out infinite -5s;
+}
+
+@keyframes floatA {
+  0%, 100% {
+    transform: translateY(0) rotate(-12deg) scale(1);
+  }
+  33% {
+    transform: translateY(-22px) rotate(8deg) scale(1.06);
+  }
+  66% {
+    transform: translateY(10px) rotate(-20deg) scale(0.94);
+  }
+}
+
+@keyframes floatB {
+  0%, 100% {
+    transform: translateY(0) rotate(14deg) scale(1);
+  }
+  25% {
+    transform: translateY(-16px) rotate(-10deg) scale(0.92);
+  }
+  50% {
+    transform: translateY(-30px) rotate(18deg) scale(1.08);
+  }
+  75% {
+    transform: translateY(8px) rotate(-6deg) scale(0.96);
+  }
+}
+
+@keyframes floatC {
+  0%, 100% {
+    transform: translateY(0) rotate(20deg) scale(0.95);
+  }
+  40% {
+    transform: translateY(-26px) rotate(-14deg) scale(1.1);
+  }
+  80% {
+    transform: translateY(6px) rotate(10deg) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatingChoice {
+    animation: none;
+  }
 }
 
 .imageContainer {
@@ -90,6 +188,28 @@ h1 {
   transform: translateY(0);
 }
 
+.button:disabled,
+.gameIdInputContainer button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.buttonSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: buttonSpin 700ms linear infinite;
+}
+
+@keyframes buttonSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .gameIdInputContainer {
   width: calc(100% - 4px);
   margin: 0;
@@ -133,6 +253,10 @@ h1 {
   cursor: pointer;
   font-size: 18px;
   width: 28px;
+}
+
+.gameIdInputContainer button:disabled {
+  color: #666666;
 }
 
 .gamePage {

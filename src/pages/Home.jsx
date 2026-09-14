@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import image from "../assets/background.png";
+import paper from "../assets/paper.png";
+import rock from "../assets/rock.png";
+import scissors from "../assets/scissors.png";
 import { useNavigate } from "react-router-dom";
 import {
   connectToServer,
@@ -15,6 +18,8 @@ function Home() {
   const navigate = useNavigate();
   const localGameId = localStorage.getItem("gameId");
   const [joiningGame, setJoiningGame] = useState(false);
+  const [creatingGame, setCreatingGame] = useState(false);
+  const [joiningInProgress, setJoiningInProgress] = useState(false);
 
   useEffect(() => {
     disconnect();
@@ -22,16 +27,21 @@ function Home() {
   }, [localGameId]);
 
   const createGame = async () => {
+    if (creatingGame || joiningInProgress) return;
+    setCreatingGame(true);
+
     let response;
     try {
       response = await fetch(`${getBackendHttpUrl()}/games`, { method: "POST" });
     } catch {
       toast.error("Unable to create a game.");
+      setCreatingGame(false);
       return;
     }
 
     if (!response.ok) {
       toast.error("Unable to create a game.");
+      setCreatingGame(false);
       return;
     }
 
@@ -40,6 +50,7 @@ function Home() {
       game = await response.json();
     } catch {
       toast.error("Invalid response from the game server.");
+      setCreatingGame(false);
       return;
     }
     if (
@@ -49,9 +60,10 @@ function Home() {
       !isAllowedWebSocketUrl(game.websocketUrl)
     ) {
       toast.error("Invalid response from the game server.");
+      setCreatingGame(false);
       return;
     }
-    connectToServer(
+    const connected = connectToServer(
       game.websocketUrl,
       (message) => {
         if (message.type === "game_created") {
@@ -62,15 +74,23 @@ function Home() {
           toast.info(message.message);
         } else if (message.type === "error") {
           alert(message.message);
+          setCreatingGame(false);
         }
       },
-      (error) => console.error("WebSocket error:", error),
-      () => console.log("WebSocket connection closed")
+      (error) => {
+        setCreatingGame(false);
+        console.error("WebSocket error:", error);
+      },
+      () => {
+        setCreatingGame(false);
+        console.log("WebSocket connection closed");
+      }
     );
-
+    if (!connected) setCreatingGame(false);
   };
 
   const joinGame = () => {
+    if (creatingGame || joiningInProgress) return;
     let gameIdInput = document.getElementById("gameIdInput");
     const enteredGameId = gameIdInput.value.trim();
     if (!enteredGameId) {
@@ -82,7 +102,8 @@ function Home() {
       return;
     }
 
-    connectToServer(
+    setJoiningInProgress(true);
+    const connected = connectToServer(
       `${getBackendWsUrl()}/ws/${encodeURIComponent(enteredGameId)}`,
       (message) => {
         if (message.type === "choice_made") {
@@ -95,16 +116,31 @@ function Home() {
           toast.info(message.message);
         } else if (message.type === "error") {
           toast.error(message.message);
+          setJoiningInProgress(false);
         }
       },
-      (error) => console.error("WebSocket error:", error),
-      () => console.log("WebSocket connection closed")
+      (error) => {
+        setJoiningInProgress(false);
+        console.error("WebSocket error:", error);
+      },
+      () => {
+        setJoiningInProgress(false);
+        console.log("WebSocket connection closed");
+      }
     );
+    if (!connected) setJoiningInProgress(false);
   };
 
   return (
     <>
       <div className="homePage">
+        <div className="floatingChoices" aria-hidden="true">
+          <img className="floatingChoice fc-1" src={rock} alt="" />
+          <img className="floatingChoice fc-2" src={paper} alt="" />
+          <img className="floatingChoice fc-3" src={scissors} alt="" />
+          <img className="floatingChoice fc-4" src={paper} alt="" />
+          <img className="floatingChoice fc-5" src={rock} alt="" />
+        </div>
         <div className="container">
           <div className="imageContainer">
             <img src={image} alt="" />
@@ -124,11 +160,13 @@ function Home() {
             <button
               id="createGameBtn"
               className="button"
+              aria-busy={creatingGame}
+              disabled={creatingGame || joiningInProgress}
               onClick={() => {
                 createGame();
               }}
             >
-              Create Game
+              {creatingGame ? <><span className="buttonSpinner" aria-hidden="true" /> Creating...</> : "Create Game"}
             </button>
             {!joiningGame ? (
               <button
@@ -156,11 +194,14 @@ function Home() {
                 />
                 <button
                   id="joinGameSubmitBtn"
+                  aria-label={joiningInProgress ? "Joining game" : "Join game"}
+                  aria-busy={joiningInProgress}
+                  disabled={creatingGame || joiningInProgress}
                   onClick={() => {
                     joinGame();
                   }}
                 >
-                  <span>➜</span>
+                  {joiningInProgress ? <span className="buttonSpinner" aria-hidden="true" /> : <span>➜</span>}
                 </button>
               </div>
             )}

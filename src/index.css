@@ -1,3 +1,8 @@
+html,
+body {
+  background-color: #141414;
+}
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -9,6 +14,11 @@ body {
 .root {
   position: relative;
   color: white;
+}
+
+.routeView {
+  width: 100%;
+  min-height: 100vh;
 }
 
 .homePage {
@@ -113,7 +123,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .floatingChoice {
+  .floatingChoice,
+  .buttonSpinner,
+  .lds-ellipsis div {
     animation: none;
   }
 }
@@ -174,7 +186,8 @@ h1 {
   padding: 16px 0px;
   text-align: center;
   text-decoration: none;
-  transition: all 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out, color 150ms ease-in-out,
+    border-color 150ms ease-in-out;
   width: calc(100% - 4px);
 }
 
@@ -332,7 +345,8 @@ h1 {
   outline: none;
   padding: 16px 0;
   text-decoration: none;
-  transition: all 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out, color 150ms ease-in-out,
+    border-color 150ms ease-in-out;
   width: 220px;
 }
 
@@ -409,10 +423,9 @@ h1 {
   outline: none;
   padding: 16px 0;
   text-decoration: none;
-  transition: all 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out, color 150ms ease-in-out;
   width: 200px;
 }
-
 .result.accept {
   background-color: #2563eb;
   color: white;
@@ -424,12 +437,17 @@ h1 {
   background-color: #1d4ed8;
 }
 
-.afterResult {
-  position: absolute;
-  border: none;
+.afterResultPositioner {
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 30;
+}
+
+.afterResult {
+  position: relative;
+  border: none;
   width: 70px;
   height: fit-content;
   background-color: black;
@@ -477,12 +495,12 @@ h1 {
 .afterResult button {
   background-color: transparent;
   border: none;
-  transition: 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out;
   cursor: pointer;
 }
 
-.afterResult button:hover{
-  transform: translateY(-1px);
+.afterResult button:hover {
+  background-color: transparent;
 }
 
 .lds-ellipsis, .lds-ellipsis div {
@@ -502,7 +520,7 @@ h1 {
   width: 13.33333px;
   height: 13.33333px;
   border-radius: 50%;
-  background: currentColor;
+  background: #ffffff;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 
@@ -681,12 +699,6 @@ h1 {
   }
 
   .afterResult {
-    position: fixed;
-    top: 50%;
-    right: 24px;
-    left: auto;
-    bottom: auto;
-    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -14,6 +14,8 @@ import {
 } from "../components/socketService";
 import { toast } from "react-toastify";
 import SEO from "../components/SEO";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { contentVariants, reducedMotionVariants, staggerVariants } from "../motion";
 
 function Home() {
   const navigate = useNavigate();
@@ -21,6 +23,8 @@ function Home() {
   const [joiningGame, setJoiningGame] = useState(false);
   const [creatingGame, setCreatingGame] = useState(false);
   const [joiningInProgress, setJoiningInProgress] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const entranceVariants = shouldReduceMotion ? reducedMotionVariants : contentVariants;
 
   useEffect(() => {
     disconnect();
@@ -147,72 +151,99 @@ function Home() {
           <img className="floatingChoice fc-4" src={paper} alt="" />
           <img className="floatingChoice fc-5" src={rock} alt="" />
         </div>
-        <div className="container">
-          <div className="imageContainer">
+        <motion.div
+          className="container"
+          variants={staggerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="imageContainer" variants={entranceVariants}>
             <img src={image} alt="" />
-          </div>
-          <h1>Rock Paper Scissors</h1>
+          </motion.div>
+          <motion.h1 variants={entranceVariants}>Rock Paper Scissors</motion.h1>
 
-          <div className="menu" id="menu">
-            <button
+          <motion.div className="menu" id="menu" variants={entranceVariants}>
+            <motion.button
               id="singlePlayerBtn"
               className="button"
+              whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.02 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
               onClick={() => {
                 navigate("/singleplayer");
               }}
             >
               Single Player
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               id="createGameBtn"
               className="button"
               aria-busy={creatingGame}
               disabled={creatingGame || joiningInProgress}
+              whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.02 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
               onClick={() => {
                 createGame();
               }}
             >
               {creatingGame ? <><span className="buttonSpinner" aria-hidden="true" /> Creating...</> : "Create Game"}
-            </button>
-            {!joiningGame ? (
-              <button
-                id="joinGameBtn"
-                className="button"
-                onClick={() => {
-                  setJoiningGame(true);
-                }}
-              >
-                Join Game
-              </button>
-            ) : (
-              <div className="gameIdInputContainer">
-                <input
-                  type="text"
-                  id="gameIdInput"
-                  placeholder="Game ID"
-                  autoComplete="off"
-                  autoFocus="on"
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      joinGame();
-                    }
-                  }}
-                />
-                <button
-                  id="joinGameSubmitBtn"
-                  aria-label={joiningInProgress ? "Joining game" : "Join game"}
-                  aria-busy={joiningInProgress}
-                  disabled={creatingGame || joiningInProgress}
+            </motion.button>
+            <AnimatePresence mode="wait" initial={false}>
+              {!joiningGame ? (
+                <motion.button
+                  key="join"
+                  variants={entranceVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  id="joinGameBtn"
+                  className="button"
+                  whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.02 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
                   onClick={() => {
-                    joinGame();
+                    setJoiningGame(true);
                   }}
                 >
-                  {joiningInProgress ? <span className="buttonSpinner" aria-hidden="true" /> : <span>➜</span>}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                  Join Game
+                </motion.button>
+              ) : (
+                <motion.div
+                  key="join-form"
+                  className="gameIdInputContainer"
+                  variants={entranceVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <input
+                    type="text"
+                    id="gameIdInput"
+                    placeholder="Game ID"
+                    autoComplete="off"
+                    autoFocus="on"
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        joinGame();
+                      }
+                    }}
+                  />
+                  <motion.button
+                    id="joinGameSubmitBtn"
+                    aria-label={joiningInProgress ? "Joining game" : "Join game"}
+                    aria-busy={joiningInProgress}
+                    disabled={creatingGame || joiningInProgress}
+                    whileHover={shouldReduceMotion ? undefined : { backgroundColor: "#e7e7e7" }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.92 }}
+                    onClick={() => {
+                      joinGame();
+                    }}
+                  >
+                    {joiningInProgress ? <span className="buttonSpinner" aria-hidden="true" /> : <span>➜</span>}
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
       </div>
     </>
   );

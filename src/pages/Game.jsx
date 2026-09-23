@@ -6,6 +6,7 @@ import {
   sendMessage,
   setMessageHandler,
 } from "../components/socketService";
+import { fireWinnerConfetti } from "../utils/confetti";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import rock from "../assets/rock.png";
@@ -17,6 +18,8 @@ import ready from "../assets/ready.png";
 import copy from "../assets/copy.png";
 import { connectToServer } from "../components/socketService";
 import SEO from "../components/SEO";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { contentVariants, reducedMotionVariants, stateVariants } from "../motion";
 
 function Game() {
   const { gameId } = useParams();
@@ -46,6 +49,13 @@ function Game() {
     you: false,
     opponent: false,
   });
+  const shouldReduceMotion = useReducedMotion();
+  const panelVariants = shouldReduceMotion ? reducedMotionVariants : contentVariants;
+  const resultVariants = shouldReduceMotion ? reducedMotionVariants : stateVariants;
+
+  useEffect(() => {
+    if (result === "win") fireWinnerConfetti();
+  }, [result]);
 
   useEffect(() => {
     if (!isValidGameId(gameId)) {
@@ -136,7 +146,7 @@ function Game() {
         nofollow
       />
       <div className="gameArea">
-        <div className="players player-1">
+        <motion.div className="players player-1" variants={panelVariants} initial="hidden" animate="visible">
           <div className="playerName">
             You{" "}
             {playerScore !== 0 || opponentScore !== 0 ? `(${playerScore})` : ""}
@@ -146,8 +156,12 @@ function Game() {
           </div>
           {choice ? (
             result ? (
-              <div
+              <motion.div
+                key={result}
                 className="result"
+                variants={resultVariants}
+                initial="hidden"
+                animate="visible"
                 style={{
                   backgroundColor:
                     result === "win"
@@ -158,7 +172,7 @@ function Game() {
                 }}
               >
                 {result === "win" ? "WON" : result === "lose" ? "LOST" : "DRAW"}
-              </div>
+              </motion.div>
             ) : (
               <div></div>
             )
@@ -166,37 +180,43 @@ function Game() {
             <div className="text">
               <p>Make your choice:</p>
               <div className="choices">
-                <button
+                <motion.button
                   id="rockBtn"
                   className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
                   onMouseOver={() => viewChoice(rock)}
                   onClick={() => sendMove("rock")}
                 >
                   <img src={rock} alt="" width="24px" /> Rock
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
                   id="paperBtn"
                   className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
                   onMouseOver={() => viewChoice(paper)}
                   onClick={() => sendMove("paper")}
                 >
                   <img src={paper} alt="" width="24px" /> Paper
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
                   id="scissorsBtn"
                   className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
                   onMouseOver={() => viewChoice(scissors)}
                   onClick={() => sendMove("scissors")}
                 >
                   <img src={scissors} alt="" width="24px" /> Scissors
-                </button>
+                </motion.button>
               </div>
             </div>
           )}
-        </div>
-        <div className="players player-2">
+        </motion.div>
+        <motion.div className="players player-2" variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.02 }}>
           <div className="playerName">
             Opponent{" "}
             {playerScore !== 0 || opponentScore !== 0
@@ -205,9 +225,12 @@ function Game() {
           </div>
           <div className="choiceImage">
             {opponentChoice ? (
-              <img
+              <motion.img
                 id="opponentChoice"
                 className="panelImage"
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.78, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 src={
                   opponentChoice === "rock"
                     ? rock
@@ -243,18 +266,24 @@ function Game() {
           {hasOpponent ? (
             result ? (
               rematchRequests.opponent ? (
-                <button
+                <motion.button
                   className="result accept"
+                  whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.03 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.93 }}
                   onClick={() => {
                     setRematchRequests((prev) => ({ ...prev, you: true }));
                     sendMessage({ type: "request_rematch", gameId });
                   }}
                 >
                   REMATCH?
-                </button>
+                </motion.button>
               ) : (
-                <div
+                <motion.div
+                  key={result}
                   className="result"
+                  variants={resultVariants}
+                  initial="hidden"
+                  animate="visible"
                   style={{
                     backgroundColor:
                       result === "win"
@@ -269,7 +298,7 @@ function Game() {
                     : result === "lose"
                     ? "WON"
                     : "DRAW"}
-                </div>
+                </motion.div>
               )
             ) : (
               <div></div>
@@ -289,32 +318,38 @@ function Game() {
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
+      <AnimatePresence>
       {result && (
-        <>
-          <div className="afterResult">
-            {rematchRequests.you && (
-              <span className="rematchRequests left">Rematch Requested!</span>
-            )}
-            <button
-              onClick={() => {
-                setRematchRequests((prev) => ({ ...prev, you: true }));
-                sendMessage({ type: "request_rematch", gameId });
-              }}
-            >
-              <img src={restart} className="restartIcon" alt="" />
-            </button>
-            <button
-              onClick={() => {
-                navigate("/");
-              }}
-            >
-              <img src={home} className="homeIcon" alt="" />
-            </button>
-          </div>
-        </>
+          <motion.div className="afterResultPositioner" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="afterResult" variants={resultVariants} initial="hidden" animate="visible" exit="exit">
+              {rematchRequests.you && (
+                <span className="rematchRequests left">Rematch Requested!</span>
+              )}
+              <motion.button
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.15, rotate: -12 }}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.88 }}
+                onClick={() => {
+                  setRematchRequests((prev) => ({ ...prev, you: true }));
+                  sendMessage({ type: "request_rematch", gameId });
+                }}
+              >
+                <img src={restart} className="restartIcon" alt="" />
+              </motion.button>
+              <motion.button
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.15, rotate: 12 }}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.88 }}
+                onClick={() => {
+                  navigate("/");
+                }}
+              >
+                <img src={home} className="homeIcon" alt="" />
+              </motion.button>
+            </motion.div>
+          </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }
